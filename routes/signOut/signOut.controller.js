@@ -13,7 +13,7 @@ const userLogout = async function (req, res) {
         data: "Database error occured",
       });
   }
-  console.log("checkanddeletetoken", checkanddeletetoken);
+  console.log(body);
     if (checkAndDeleteToken) {
         return res.status(200).json({
           success: 1,

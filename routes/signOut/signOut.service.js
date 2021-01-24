@@ -2,7 +2,6 @@ const pool = require("../../config/database");
 const promisePool = pool.promise();
 
 
-
 const checkToken = async function (data) {
   const conn = await promisePool.getConnection();
   if (!conn) {
@@ -16,11 +15,11 @@ const checkToken = async function (data) {
     `select user_id from jwt where jwt_token = ?`,
     [data.token]
   );
-
-  if(existingToken){
+ console.log("userId",existingToken[0][0]);
+  if(existingToken[0][0]){
     const deleteToken = await promisePool.query(
       `delete from jwt where user_id = ?`,
-      [data.user_id]
+      [existingToken[0][0].user_id]
   );
 
     if (!deleteToken) {
