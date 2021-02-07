@@ -1,6 +1,11 @@
 const { genSaltSync, hashSync } = require("bcrypt");
 const Joi = require("joi");
-const { checkPhone, checkEmail, insertIntoUser } = require("./signUp.service");
+const {
+  checkPhone,
+  checkEmail,
+  insertIntoUser,
+  getDeptID,
+} = require("./signUp.service");
 
 const createUser = async function (req, res) {
   console.log("Hit api /signUp");
@@ -23,6 +28,9 @@ const createUser = async function (req, res) {
     address: Joi.string().required(),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
+    dept_id: Joi.number().required(),
+    experience: Joi.number().required(),
+    specialization: Joi.string().required(),
   });
 
   const { error } = await schema.validate(body); // check if validation returns an error
@@ -54,7 +62,7 @@ const createUser = async function (req, res) {
   body.date_of_registration = date_of_registration;
 
   //check if phone exists
-  let phoneRows, emailRows, insertRows;
+  let phoneRows, emailRows, insertRows, department;
   try {
     phoneRows = await checkPhone(body);
   } catch {
@@ -86,6 +94,25 @@ const createUser = async function (req, res) {
       user_id: emailRows[0].user_id,
     });
   }
+  //get department id
+  try {
+    department = await getDeptID(body);
+  } catch {
+    return res.status(500).json({
+      success: false,
+      data: "Database error , couldnt get department ID",
+    });
+  }
+  console.log("dept", department);
+
+  if (!department[0]) {
+    return res.status(400).json({
+      success: false,
+      data: "Department ID doesnt exist",
+    });
+  }
+
+  body.dept_name = department[0].dept_name;
   //insert into user table
   try {
     insertRows = await insertIntoUser(body);
@@ -99,14 +126,14 @@ const createUser = async function (req, res) {
   if (!insertRows) {
     return res.status(500).json({
       success: false,
-      data: "Insert into user and auth table failed",
+      data: "Insert into user, auth and doctor table failed",
+    });
+  } else {
+    return res.status(200).json({
+      success: true,
+      data: "Insert new staff user successful",
     });
   }
-  return res.status(200).json({
-    success: true,
-    data: "Insert new user successful",
-    details: insertRows,
-  });
 };
 
 module.exports = {

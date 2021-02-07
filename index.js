@@ -6,7 +6,9 @@ const morgan = require("morgan");
 
 const signUpRoute = require("./routes/signUp/signUp.router");
 const signInRoute = require("./routes/signIn/signIn.router");
-const signOutRoute = require("./routes/signOut/signOut.router");
+const signUpStaffRoute = require("./routes/signUpStaff/signUp.router");
+const signInStaffRoute = require("./routes/signInStaff/signIn.router");
+const getDoctorsRoute = require("./routes/getDoctors/getDoctors.router");
 
 //ADD MIDDLEWARES
 app.use(cors());
@@ -16,11 +18,14 @@ app.use(express.json());
 //ADD API ROUTES
 app.use("/signUp", signUpRoute);
 app.use("/signIn", signInRoute);
-app.use("/signOut", signOutRoute);
+app.use("/signUpStaff", signUpStaffRoute);
+app.use("/signInStaff", signInStaffRoute);
+app.use("/getDoctors", getDoctorsRoute);
+// app.use('/signInStaff');
 
 app.get("/", (req, res) => {
   res.json({
-    success: 1,
+    success: true,
     data: "Welcome to the Hospital Management Application",
   });
 });

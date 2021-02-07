@@ -9,7 +9,7 @@ const generateToken = async function (data) {
 };
 
 const userLogin = async function (req, res) {
-  console.log("Hit api /signIn");
+  console.log("Hit api /signInStaff");
   const body = req.body;
 
   // JOI validation for all user inputs

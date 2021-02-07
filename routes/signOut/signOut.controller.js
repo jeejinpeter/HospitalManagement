@@ -22,7 +22,7 @@ const userLogout = async function (req, res) {
       } else {
         return res.status(500).json({
           success: 0,
-          data: "Logout failed..Try Again",
+          data: "Something went wrong..",
         });
       }
 }

@@ -21,6 +21,17 @@ const checkEmail = async function (data) {
   return rows;
 };
 
+const getDeptID = async function (data) {
+  const [
+    rows,
+    fields,
+  ] = await promisePool.query(
+    `select dept_name from department where dept_id = (?)`,
+    [data.dept_id]
+  );
+  return rows;
+};
+
 const insertIntoUser = async function (data) {
   const conn = await promisePool.getConnection();
   if (!conn) {
@@ -55,27 +66,36 @@ const insertIntoUser = async function (data) {
     promisePool.query("ROLLBACK");
     return new Error("Select user_id failed");
   }
-  console.log("INSERTING TO DB");
+  console.log("INSERTING TO user table");
   console.log("user_id", user_id[0][0].user_id);
   const results = await promisePool.query(
     `insert into auth(user_id, email, password, role) values(?,?,?,?)`,
-    [user_id[0][0].user_id, data.email, data.password, 1]
+    [user_id[0][0].user_id, data.email, data.password, 2]
   );
   if (!results) {
     promisePool.query("ROLLBACK");
     return new Error("Insert into auth table failed");
-  } else {
-    promisePool.query("COMMIT");
-    console.log("results", results);
-    return {
-      success: true,
-      data: results,
-    };
   }
+  const insertDoctor = await promisePool.query(
+    `insert into doctor() values(?,?,?,?)`,
+    [user_id[0][0].user_id, data.specialization, data.experience, data.dept_id]
+  );
+  if (!insertDoctor) {
+    promisePool.query("ROLLBACK");
+    return new Error("Insert into doctor table failed");
+  }
+
+  promisePool.query("COMMIT");
+  console.log("results", results);
+  return {
+    success: true,
+    data: results,
+  };
 };
 
 module.exports = {
   checkPhone,
   checkEmail,
+  getDeptID,
   insertIntoUser,
 };
